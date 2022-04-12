@@ -9,6 +9,7 @@ import Footer from "./component/Footer";
 
 import { Route, Switch, useHistory } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { format } from "date-fns";
 
 const App = () => {
   const [posts, setPosts] = useState([
@@ -39,8 +40,26 @@ const App = () => {
   ]);
   const [search, setSearch] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  const [postTitle, setPostTitle] = useState("");
+  const [postBody, setPostBody] = useState("");
 
-  const handleDelete = (id) => {};
+  const history = useHistory();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // 取得目前資料裡的最後一筆的id值 +1，如果沒有資料就是給1
+    const id = posts.length ? posts[posts.length - 1].id + 1 : 1;
+    const datetime = format(new Date(), 'MMMM dd, yyyy pp');
+    const newPost = {id, title:postTitle, datetime, body: postBody}
+    
+  };
+
+  // 刪除完就回到根目錄
+  const handleDelete = (id) => {
+    const postsList = posts.filter((post) => post.id !== id);
+    setPosts(postsList);
+    history.push("/");
+  };
   return (
     <div className="App">
       <Header title="React JS Blog" />
@@ -52,7 +71,13 @@ const App = () => {
         </Route>
 
         <Route exact path="/post">
-          <NewPost />
+          <NewPost
+            postTitle={postTitle}
+            setPostTitle={setPostTitle}
+            postBody={postBody}
+            setPostBody={setPostBody}
+            handleSubmit={handleSubmit}
+          />
         </Route>
 
         <Route path="/post/:id">
