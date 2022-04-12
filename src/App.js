@@ -40,6 +40,7 @@ const App = () => {
   const [search, setSearch] = useState("");
   const [searchResults, setSearchResults] = useState([]);
 
+  const handleDelete = (id) => {};
   return (
     <div className="App">
       <Header title="React JS Blog" />
@@ -47,7 +48,7 @@ const App = () => {
 
       <Switch>
         <Route exact path="/">
-          <Home posts={posts}/>
+          <Home posts={posts} />
         </Route>
 
         <Route exact path="/post">
@@ -55,7 +56,7 @@ const App = () => {
         </Route>
 
         <Route path="/post/:id">
-          <PostPage />
+          <PostPage posts={posts} handleDelete={handleDelete} />
         </Route>
 
         <Route path="/about" component={About} />
