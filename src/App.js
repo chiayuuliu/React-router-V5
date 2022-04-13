@@ -6,10 +6,12 @@ import PostPage from "./component/PostPage";
 import About from "./component/About";
 import Missing from "./component/Missing";
 import Footer from "./component/Footer";
+import EditPost from "./component/EditPost";
 
 import { Route, Switch, useHistory } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
+import api from "./api/posts";
 
 const App = () => {
   // 文章列表
@@ -41,12 +43,34 @@ const App = () => {
   ]);
   const [search, setSearch] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-  // 文章標題
+  // 新增
   const [postTitle, setPostTitle] = useState("");
-  // 文章內容
   const [postBody, setPostBody] = useState("");
 
+  // 修改
+  const [editTitle, setEditTitle] = useState("");
+  const [editBody, setEditBody] = useState("");
+
   const history = useHistory();
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await api.get("/posts");
+        setPosts(response.data);
+        // axios 會自動處理錯誤，不用判斷是否有回應資料
+      } catch (err) {
+        if (err.response) {
+          console.log(err.response.data);
+          console.log(err.response.status);
+          console.log(err.response.headers);
+        } else {
+          console.log(`Error:${err.message}`);
+        }
+      }
+    };
+    fetchPosts();
+  }, []);
 
   useEffect(() => {
     const filteredResults = posts.filter(
@@ -59,25 +83,53 @@ const App = () => {
     setSearchResults(filteredResults.reverse());
   }, [posts, search]);
 
-  const handleSubmit = (e) => {
+  // 新增文章
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // 取得目前資料裡的最後一筆的id值 +1，如果沒有資料表示是空陣列，那id就是從1開始
     const id = posts.length ? posts[posts.length - 1].id + 1 : 1;
     const datetime = format(new Date(), "MMMM dd, yyyy pp");
     const newPost = { id, title: postTitle, datetime, body: postBody };
-    const allPosts = [...posts, newPost];
-    setPosts(allPosts);
-    // 新增完文章後，新增的欄位清空，並回到首頁
-    setPostTitle("");
-    setPostBody("");
-    history.push("/");
+    // **研究try catch
+    try {
+      const response = await api.post("/posts", newPost);
+      const allPosts = [...posts, response.data];
+      console.log("res-data", response);
+      setPosts(allPosts);
+      setPostTitle("");
+      setPostBody("");
+      history.push("/");
+    } catch (err) {
+      console.log(`Error: ${err.message}`);
+    }
   };
 
-  // 刪除完就回到根目錄
-  const handleDelete = (id) => {
-    const postsList = posts.filter((post) => post.id !== id);
-    setPosts(postsList);
-    history.push("/");
+  // 修改
+  const handleEdit = async (id) => {
+    const datetime = format(new Date(), "MMMM dd, yyyy pp");
+    const updatedPost = { id, title: editTitle, datetime, body: editBody };
+    try {
+      const response = await api.put(`/posts/${id}`, updatedPost);
+      setPosts(
+        posts.map((post) => (post.id === id ? { ...response.data } : post))
+      );
+      setEditTitle("");
+      setEditBody("");
+      history.push("/");
+    } catch (err) {
+      console.log(`Error: ${err.message}`);
+    }
+  };
+  // 刪除
+  const handleDelete = async (id) => {
+    try {
+      await api.delete(`/posts/${id}`);
+      const postsList = posts.filter((post) => post.id !== id);
+      setPosts(postsList);
+      history.push("/");
+    } catch (err) {
+      console.log(`Error: ${err.message}`);
+    }
   };
   return (
     <div className="App">
@@ -89,6 +141,7 @@ const App = () => {
           <Home posts={searchResults} />
         </Route>
 
+        {/* 新增 */}
         <Route exact path="/post">
           <NewPost
             postTitle={postTitle}
@@ -96,6 +149,18 @@ const App = () => {
             postBody={postBody}
             setPostBody={setPostBody}
             handleSubmit={handleSubmit}
+          />
+        </Route>
+
+        {/* 編輯 */}
+        <Route path="/edit/:id">
+          <EditPost
+            posts={posts}
+            editTitle={editTitle}
+            setEditTitle={setEditTitle}
+            editBody={editBody}
+            setEditBody={setEditBody}
+            handleEdit={handleEdit}
           />
         </Route>
 

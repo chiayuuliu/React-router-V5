@@ -126,6 +126,7 @@ body {
 
 .Home, .NewPost, .PostPage, .About, .Missing {
   width: 100%;
+  /* flex-grow 才會撐篙整個內容 */
   flex-grow: 1;
   padding: 1rem;
   overflow-y: auto;
@@ -199,21 +200,30 @@ body {
   cursor: pointer;
 }
 
-.Missing h2, .PostPage h2, 
-.Missing p, .PostPage p {
-  margin-bottom: 1rem;
+
+.Missing p, .PostPage p,
+.NewPost p {
+  margin-Top: 1rem;
 }
 
 .PostPage button {
   height: 48px;
   min-width: 48px;
   border-radius: 0.25rem;
-  padding: 0.5rem;
+  padding: 0.5rem 1rem;
   font-size: 1rem;
-  background-color: red;
+  margin-right: 0.5rem;
   color: #fff;
+  border: none;
   cursor: pointer;
 }
+.editButton{
+  background-color: rgb(0, 94, 201);
+}
+.deleteButton{
+  background-color: rgb(255, 88, 88);
+}
+
 
 .statusMsg {
   margin-top: 2rem;
