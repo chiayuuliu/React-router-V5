@@ -12,6 +12,7 @@ import { useState, useEffect } from "react";
 import { format } from "date-fns";
 
 const App = () => {
+  // 文章列表
   const [posts, setPosts] = useState([
     {
       id: 1,
@@ -40,18 +41,36 @@ const App = () => {
   ]);
   const [search, setSearch] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  // 文章標題
   const [postTitle, setPostTitle] = useState("");
+  // 文章內容
   const [postBody, setPostBody] = useState("");
 
   const history = useHistory();
 
+  useEffect(() => {
+    const filteredResults = posts.filter(
+      // 文章標題或文章內容有包含搜尋字都回傳
+      (post) =>
+        post.body.toLowerCase().includes(search.toLowerCase()) ||
+        post.title.toLowerCase().includes(search.toLowerCase())
+    );
+    // 讓最新的文章在最前面
+    setSearchResults(filteredResults.reverse());
+  }, [posts, search]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    // 取得目前資料裡的最後一筆的id值 +1，如果沒有資料就是給1
+    // 取得目前資料裡的最後一筆的id值 +1，如果沒有資料表示是空陣列，那id就是從1開始
     const id = posts.length ? posts[posts.length - 1].id + 1 : 1;
-    const datetime = format(new Date(), 'MMMM dd, yyyy pp');
-    const newPost = {id, title:postTitle, datetime, body: postBody}
-    
+    const datetime = format(new Date(), "MMMM dd, yyyy pp");
+    const newPost = { id, title: postTitle, datetime, body: postBody };
+    const allPosts = [...posts, newPost];
+    setPosts(allPosts);
+    // 新增完文章後，新增的欄位清空，並回到首頁
+    setPostTitle("");
+    setPostBody("");
+    history.push("/");
   };
 
   // 刪除完就回到根目錄
@@ -67,7 +86,7 @@ const App = () => {
 
       <Switch>
         <Route exact path="/">
-          <Home posts={posts} />
+          <Home posts={searchResults} />
         </Route>
 
         <Route exact path="/post">
