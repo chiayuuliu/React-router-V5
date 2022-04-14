@@ -13,6 +13,7 @@ import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import api from "./api/posts";
 import useWindowSize from "./hooks/useWindowSize";
+import useAxiosFetch from "./hooks/useAxiosFetch";
 
 const App = () => {
   // 文章列表
@@ -54,27 +55,37 @@ const App = () => {
 
   const history = useHistory();
 
-  const { width } = useWindowSize()
+  const { width } = useWindowSize();
+  const { data, fetchError, isLoading } = useAxiosFetch(
+    "http://localhost:3500/posts"
+  );
 
-  //  取資料，有設定api的baseURL
+  // 相依性設定data, 就會在抓到資料的時候又在設定回posts，如果一開始因為時間差沒有抓到資料，當api有response 的時候又會在設定回posts
+  
   useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const response = await api.get("/posts");
-        setPosts(response.data);
-        // axios 會自動處理錯誤，不用判斷是否有回應資料
-      } catch (err) {
-        if (err.response) {
-          console.log(err.response.data);
-          console.log(err.response.status);
-          console.log(err.response.headers);
-        } else {
-          console.log(`Error:${err.message}`);
-        }
-      }
-    };
-    fetchPosts();
-  }, []);
+    console.log("data", data);
+    setPosts(data);
+  }, [data]);
+
+  // axios 取資料方式取資料，有設定api的baseURL
+  // axios 會自動處理錯誤，不用判斷是否有回應資料
+  // useEffect(() => {
+  //   const fetchPosts = async () => {
+  //     try {
+  //       const response = await api.get("/posts");
+  //       setPosts(response.data);
+  //     } catch (err) {
+  //       if (err.response) {
+  //         console.log(err.response.data);
+  //         console.log(err.response.status);
+  //         console.log(err.response.headers);
+  //       } else {
+  //         console.log(`Error:${err.message}`);
+  //       }
+  //     }
+  //   };
+  //   fetchPosts();
+  // }, []);
 
   //  篩選資料
   useEffect(() => {
@@ -139,12 +150,17 @@ const App = () => {
   };
   return (
     <div className="App">
-      <Header title="React JS Blog" />
+      <Header title="React JS Blog" width={width} />
       <Nav search={search} setSearch={setSearch} />
 
       <Switch>
         <Route exact path="/">
-          <Home posts={searchResults} width={width} />
+          <Home
+            // 篩選後的資料往下傳
+            posts={searchResults}
+            fetchError={fetchError}
+            isLoading={isLoading}
+          />
         </Route>
 
         {/* 新增 */}
