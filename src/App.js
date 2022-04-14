@@ -12,6 +12,7 @@ import { Route, Switch, useHistory } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import api from "./api/posts";
+import useWindowSize from "./hooks/useWindowSize";
 
 const App = () => {
   // 文章列表
@@ -53,6 +54,9 @@ const App = () => {
 
   const history = useHistory();
 
+  const { width } = useWindowSize()
+
+  //  取資料，有設定api的baseURL
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -72,9 +76,10 @@ const App = () => {
     fetchPosts();
   }, []);
 
+  //  篩選資料
   useEffect(() => {
     const filteredResults = posts.filter(
-      // 文章標題或文章內容有包含搜尋字都回傳
+      // 文章標題"或"文章內容有包含搜尋字都回傳
       (post) =>
         post.body.toLowerCase().includes(search.toLowerCase()) ||
         post.title.toLowerCase().includes(search.toLowerCase())
@@ -105,6 +110,7 @@ const App = () => {
   };
 
   // 修改
+  // 將要修改的新的文章標題跟內文設定給updatedPost 裡並送api
   const handleEdit = async (id) => {
     const datetime = format(new Date(), "MMMM dd, yyyy pp");
     const updatedPost = { id, title: editTitle, datetime, body: editBody };
@@ -138,7 +144,7 @@ const App = () => {
 
       <Switch>
         <Route exact path="/">
-          <Home posts={searchResults} />
+          <Home posts={searchResults} width={width} />
         </Route>
 
         {/* 新增 */}

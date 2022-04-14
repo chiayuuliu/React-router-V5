@@ -15,6 +15,7 @@ const EditPost = ({
 
   useEffect(() => {
     if (post) {
+      // 將指定修改的文章標題跟內文設定給狀態
       setEditTitle(post.title);
       setEditBody(post.body);
     }

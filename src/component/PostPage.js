@@ -4,7 +4,7 @@ import { useParams, Link } from "react-router-dom";
 // 單篇文章細節頁
 const PostPage = ({ posts, handleDelete }) => {
   const { id } = useParams();
-  // **研究find 用法
+  // 回傳符合條件的第一個值，如果沒有值會回傳undefined
   const post = posts.find((post) => post.id.toString() === id);
 
   return (

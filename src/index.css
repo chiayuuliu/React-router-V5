@@ -181,7 +181,6 @@ body {
   min-height: 48px;
   font-size: 1rem;
   padding: 0.25rem;
-  border-radius: 0.25rem;
   margin-right: 0.25rem;
   outline: none;
 }
@@ -191,10 +190,11 @@ body {
 }
 
 .newPostForm button {
+  border: none;
   margin-top: 1rem;
   height: 48px;
   min-width: 48px;
-  border-radius: 10px;
+  border-radius: 5px;
   padding: 0.5rem;
   font-size: 1rem;
   cursor: pointer;
