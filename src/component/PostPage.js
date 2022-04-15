@@ -1,8 +1,11 @@
 import React from "react";
 import { useParams, Link } from "react-router-dom";
+import { useContext } from "react";
+import DataContext from "../context/DataContext";
 
 // 單篇文章細節頁
-const PostPage = ({ posts, handleDelete }) => {
+const PostPage = () => {
+  const { posts, handleDelete } = useContext(DataContext);
   const { id } = useParams();
   // 回傳符合條件的第一個值，如果沒有值會回傳undefined
   const post = posts.find((post) => post.id.toString() === id);
