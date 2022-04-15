@@ -13,10 +13,9 @@ import { DataProvider } from "./context/DataContext";
 const App = () => {
   return (
     <div className="App">
+      <Header title="React JS Blog" />
       <DataProvider>
-        <Header title="React JS Blog" />
         <Nav />
-
         <Switch>
           <Route exact path="/" component={Home} />
           {/* 新增 */}
@@ -28,9 +27,9 @@ const App = () => {
           <Route path="/about" component={About} />
           <Route path="*" component={Missing} />
         </Switch>
-
-        <Footer />
       </DataProvider>
+
+      <Footer />
     </div>
   );
 };

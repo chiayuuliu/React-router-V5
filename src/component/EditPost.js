@@ -1,13 +1,37 @@
-import React, { useEffect,useContext } from "react";
-import { useParams, Link } from "react-router-dom";
+import React, { useEffect, useState, useContext } from "react";
+import { useParams, Link, useHistory } from "react-router-dom";
+import { format } from "date-fns";
+import api from "../api/posts";
 import DataContext from "../context/DataContext";
 
 const EditPost = () => {
-  const { posts, handleEdit, editBody, setEditBody, editTitle, setEditTitle } =
-    useContext(DataContext);
+  const { posts, setPosts } = useContext(DataContext);
+  // 修改
+  const [editTitle, setEditTitle] = useState("");
+  const [editBody, setEditBody] = useState("");
+
   const { id } = useParams();
   // 先找到單篇要修改的文章
   const post = posts.find((post) => post.id.toString() === id);
+  const history = useHistory();
+
+  // 修改
+  // 將要修改的新的文章標題跟內文設定給updatedPost 裡並送api
+  const handleEdit = async (id) => {
+    const datetime = format(new Date(), "MMMM dd, yyyy pp");
+    const updatedPost = { id, title: editTitle, datetime, body: editBody };
+    try {
+      const response = await api.put(`/posts/${id}`, updatedPost);
+      setPosts(
+        posts.map((post) => (post.id === id ? { ...response.data } : post))
+      );
+      setEditTitle("");
+      setEditBody("");
+      history.push("/");
+    } catch (err) {
+      console.log(`Error: ${err.message}`);
+    }
+  };
 
   useEffect(() => {
     if (post) {
